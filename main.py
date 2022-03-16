@@ -1,6 +1,8 @@
 import pygame
 from random import *
 
+from cell import Cell
+
 pygame.init()
 pygame.font.init()
 
@@ -23,14 +25,22 @@ ticks = 0
 
 clock = pygame.time.Clock()
 
+
+cells = []
+cell_size = 50
 ################################################################################################
 #                                           FUNCTIONS
 ################################################################################################
-
+def initCells():
+    for i in range(int(width / cell_size)):
+        cells.append([])
+        for j in range(int(height / cell_size)):
+            cells[i].append(Cell((i, j)))
 ################################################################################################
 #                                           MAIN LOOP
 ################################################################################################
 
+initCells()
 while running:
 
     ##################################################################
@@ -57,6 +67,10 @@ while running:
 
 
     screen.fill((0, 0, 0))
+
+    for i in range(len(cells)):
+        for j in range(len(cells[i])):
+            cells[i][j].draw(screen, cell_size)
 
     # if oldest_vehicle != None:
     #     pygame.draw.circle(screen, (255, 255, 255), oldest_vehicle.position, 20, 2)
