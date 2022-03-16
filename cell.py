@@ -12,7 +12,7 @@ class Cell:
     }
 
     grid_pos = (0, 0)
-    is_visited = False
+    visited = False
 
     def __init__(self, position) -> None:
         self.grid_pos = position
@@ -21,8 +21,8 @@ class Cell:
         cartesian_pos = self.grid_to_cartesian(cell_size)
 
         col = (255, 0, 0)
-        if self.is_visited:
-            col = (255, 255, 0)
+        if self.visited:
+            col = (0, 255, 0)
 
         pygame.draw.rect(SURFACE, col, (cartesian_pos[0], cartesian_pos[1], cell_size, cell_size))
             
@@ -33,6 +33,28 @@ class Cell:
 
     def grid_to_cartesian(self, cell_size):
         return (self.grid_pos[0] * cell_size, self.grid_pos[1] * cell_size)
+
+    @staticmethod
+    def dir_to_grid(dir_key):
+        if dir_key == "Left":
+            return (-1, 0)
+        elif dir_key == "Bottom":
+            return (0, 1)
+        elif dir_key == "Right":
+            return (1, 0)
+        elif dir_key == "Top":
+            return (0, -1)
+
+    @staticmethod
+    def grid_to_dir(grid_pos):
+        if grid_pos == (-1, 0):
+            return "Left"
+        elif grid_pos == (0, 1):
+            return "Bottom"
+        elif grid_pos == (1, 0):
+            return "Right"
+        elif grid_pos == (0, -1):
+            return "Top"
 
     def get_line_positions(self, line_key, cell_size):
         cartesian_pos = self.grid_to_cartesian(cell_size)

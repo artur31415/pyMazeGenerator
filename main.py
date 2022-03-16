@@ -28,19 +28,37 @@ clock = pygame.time.Clock()
 
 cells = []
 cell_size = 50
+
+grid_resolution_x = int(width / cell_size)
+grid_resolution_y = int(height / cell_size)
+
+current_cell_pos = (0, 0)
+
+walk_dirs = [
+    (-1, 0), 
+    (0, -1),
+    (1, 0),
+    (0, 1)
+]
 ################################################################################################
 #                                           FUNCTIONS
 ################################################################################################
 def initCells():
-    for i in range(int(width / cell_size)):
+    for i in range(grid_resolution_x):
         cells.append([])
-        for j in range(int(height / cell_size)):
-            cells[i].append(Cell((i, j)))
+        for j in range(grid_resolution_y):
+            new_cell = Cell((i, j))
+            cells[i].append(new_cell)
 ################################################################################################
 #                                           MAIN LOOP
 ################################################################################################
 
 initCells()
+
+#FIXME:
+cells[3][0].walls["Bottom"] = False
+cells[3][0].walls["Top"] = False
+
 while running:
 
     ##################################################################
@@ -57,6 +75,22 @@ while running:
     ##################################################################
     # STATE UPDATE
     ##################################################################
+
+    cells[current_cell_pos[0]][current_cell_pos[1]].visited = True
+    
+    for walk_dir in walk_dirs:
+        neighbour_pos = (current_cell_pos[0] + walk_dir[0], current_cell_pos[1] + walk_dir[1])
+        #print(str(neighbour_pos))
+        if neighbour_pos[0] >= 0 and neighbour_pos[0] < grid_resolution_x and neighbour_pos[1] >= 0 and neighbour_pos[1] < grid_resolution_y:
+            #print("here1")
+            if not cells[neighbour_pos[0]][neighbour_pos[1]].visited:
+                current_dir = Cell.grid_to_dir(walk_dir)
+                neighbour_dir = Cell.grid_to_dir((-walk_dir[0], -walk_dir[1]))
+                # cells[current_cell_pos[0]][current_cell_pos[1]].walls[current_dir] = False
+                # cells[neighbour_pos[0]][neighbour_pos[1]].walls[neighbour_dir] = False
+                current_cell_pos = neighbour_pos
+                print(current_dir, "; ", neighbour_dir)
+                break
 
 
     ##################################################################
@@ -81,7 +115,7 @@ while running:
     ##################################################################
     pygame.display.flip()
 
-    clock.tick(20)
+    clock.tick(1)
     
 
 # Done! Time to quit.
