@@ -27,7 +27,7 @@ clock = pygame.time.Clock()
 
 
 cells = []
-cell_size = 50
+cell_size = 5
 
 grid_resolution_x = int(width / cell_size)
 grid_resolution_y = int(height / cell_size)
@@ -42,6 +42,7 @@ walk_dirs = [
 ]
 
 visited_cell_positions = []
+backtracking_index = 1
 ################################################################################################
 #                                           FUNCTIONS
 ################################################################################################
@@ -63,6 +64,8 @@ initCells()
 
 cells[current_cell_pos[0]][current_cell_pos[1]].visited = True
 
+visited_cell_positions.append(current_cell_pos)
+
 while running:
 
     ##################################################################
@@ -83,7 +86,8 @@ while running:
     
 
     search_count = 0
-    while True:
+    
+    while backtracking_index > 0:
         walk_dir = walk_dirs[randint(0, len(walk_dirs) - 1)]
     
         neighbour_pos = (current_cell_pos[0] + walk_dir[0], current_cell_pos[1] + walk_dir[1])
@@ -97,11 +101,20 @@ while running:
                 cells[neighbour_pos[0]][neighbour_pos[1]].walls[neighbour_dir] = False
                 current_cell_pos = neighbour_pos
                 cells[current_cell_pos[0]][current_cell_pos[1]].visited = True
-                print(current_dir, "; ", neighbour_dir)
+                visited_cell_positions.append(current_cell_pos)
+                backtracking_index = len(visited_cell_positions) - 1
+                #print(current_dir, "; ", neighbour_dir)
                 break
         search_count += 1
         if search_count >= len(walk_dirs):
-            print("STUCK! ", str(current_cell_pos))
+            print("STUCK! ", str(backtracking_index), "/", str(len(visited_cell_positions)))
+
+            backtracking_index -= 1
+            if backtracking_index < 0:
+                print("DONE!")
+            else:
+                current_cell_pos = visited_cell_positions[backtracking_index]
+                break
 
 
     ##################################################################
@@ -128,7 +141,7 @@ while running:
     ##################################################################
     pygame.display.flip()
 
-    clock.tick(5)
+    clock.tick(50)
     
 
 # Done! Time to quit.
