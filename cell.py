@@ -4,18 +4,23 @@ import pygame
 class Cell:
 
 
-    walls = {
-        "Left": True,
-        "Right": True,
-        "Top": True,
-        "Bottom": True
-    }
+    
+    # walls = {
+    #     "Left": True,
+    #     "Right": True,
+    #     "Top": True,
+    #     "Bottom": True
+    # }
 
     grid_pos = (0, 0)
     visited = False
 
-    def __init__(self, position) -> None:
+    def __init__(self, position, walls) -> None:
         self.grid_pos = position
+        self.walls = {}
+
+        for k, v in walls.items():
+            self.walls[k] = v
 
     def draw(self, SURFACE, cell_size):
         cartesian_pos = self.grid_to_cartesian(cell_size)
@@ -76,3 +81,6 @@ class Cell:
             print("what key? ", str(line_key))
 
         return start_pos, end_pos
+
+    def to_string(self):
+        return "position = " + str(self.grid_pos) + "; walls = " + str(self.walls)

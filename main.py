@@ -40,6 +40,8 @@ walk_dirs = [
     (1, 0),
     (0, 1)
 ]
+
+visited_cell_positions = []
 ################################################################################################
 #                                           FUNCTIONS
 ################################################################################################
@@ -47,7 +49,7 @@ def initCells():
     for i in range(grid_resolution_x):
         cells.append([])
         for j in range(grid_resolution_y):
-            new_cell = Cell((i, j))
+            new_cell = Cell((i, j), {"Left": True, "Bottom": True, "Right": True, "Top": True})
             cells[i].append(new_cell)
 ################################################################################################
 #                                           MAIN LOOP
@@ -55,9 +57,11 @@ def initCells():
 
 initCells()
 
-#FIXME:
-cells[3][0].walls["Bottom"] = False
-cells[3][0].walls["Top"] = False
+# for i in range(len(cells)):
+#         for j in range(len(cells[i])):
+#             print("cells [", str(i), "][", str(j), "] = ", cells[i][j].to_string())
+
+cells[current_cell_pos[0]][current_cell_pos[1]].visited = True
 
 while running:
 
@@ -76,9 +80,12 @@ while running:
     # STATE UPDATE
     ##################################################################
 
-    cells[current_cell_pos[0]][current_cell_pos[1]].visited = True
     
-    for walk_dir in walk_dirs:
+
+    search_count = 0
+    while True:
+        walk_dir = walk_dirs[randint(0, len(walk_dirs) - 1)]
+    
         neighbour_pos = (current_cell_pos[0] + walk_dir[0], current_cell_pos[1] + walk_dir[1])
         #print(str(neighbour_pos))
         if neighbour_pos[0] >= 0 and neighbour_pos[0] < grid_resolution_x and neighbour_pos[1] >= 0 and neighbour_pos[1] < grid_resolution_y:
@@ -86,11 +93,15 @@ while running:
             if not cells[neighbour_pos[0]][neighbour_pos[1]].visited:
                 current_dir = Cell.grid_to_dir(walk_dir)
                 neighbour_dir = Cell.grid_to_dir((-walk_dir[0], -walk_dir[1]))
-                # cells[current_cell_pos[0]][current_cell_pos[1]].walls[current_dir] = False
-                # cells[neighbour_pos[0]][neighbour_pos[1]].walls[neighbour_dir] = False
+                cells[current_cell_pos[0]][current_cell_pos[1]].walls[current_dir] = False
+                cells[neighbour_pos[0]][neighbour_pos[1]].walls[neighbour_dir] = False
                 current_cell_pos = neighbour_pos
+                cells[current_cell_pos[0]][current_cell_pos[1]].visited = True
                 print(current_dir, "; ", neighbour_dir)
                 break
+        search_count += 1
+        if search_count >= len(walk_dirs):
+            print("STUCK! ", str(current_cell_pos))
 
 
     ##################################################################
@@ -105,6 +116,8 @@ while running:
     for i in range(len(cells)):
         for j in range(len(cells[i])):
             cells[i][j].draw(screen, cell_size)
+            if (i, j) == current_cell_pos:
+                pygame.draw.rect(screen, (100, 100, 0), (i * cell_size + cell_size / 4, j * cell_size + cell_size / 4, cell_size / 2, cell_size / 2))
 
     # if oldest_vehicle != None:
     #     pygame.draw.circle(screen, (255, 255, 255), oldest_vehicle.position, 20, 2)
@@ -115,7 +128,7 @@ while running:
     ##################################################################
     pygame.display.flip()
 
-    clock.tick(1)
+    clock.tick(5)
     
 
 # Done! Time to quit.
